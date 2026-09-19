@@ -1,0 +1,6 @@
+@tailwind base;@tailwind components;@tailwind utilities;
+:root{--bg:#050507;--surface:#0b0a10;--lav:#a970ff;--lav2:#c69cff;--muted:#a9a5b2;--line:rgba(198,156,255,.2)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;background:radial-gradient(circle at 80% 8%,rgba(109,53,201,.13),transparent 28%),var(--bg);color:#fff;overflow-x:hidden}a{text-decoration:none;color:inherit}button,input,textarea{font:inherit}::selection{background:rgba(169,112,255,.35)}
+.gridbg{position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:70px 70px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(12px,-10px)}}@keyframes spin{to{transform:rotate(360deg)}}.drift{animation:drift 8s ease-in-out infinite}.spin{animation:spin 24s linear infinite}.glow{box-shadow:0 0 55px rgba(169,112,255,.18)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#050507}::-webkit-scrollbar-thumb{background:#5d3a89;border-radius:20px}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
