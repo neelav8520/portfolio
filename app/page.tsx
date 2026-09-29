@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   ArrowDown,
   ArrowRight,
@@ -29,59 +30,141 @@ export default function Home() {
   const hero = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!hero.current) return;
+    const section = hero.current;
+    if (!section) return;
+
+    gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      gsap
-        .timeline({
-          defaults: { ease: 'power4.out' },
-        })
-        .from('.kicker', {
-          y: 25,
-          opacity: 0,
-          duration: 0.7,
-        })
-        .from(
-          '.letter',
-          {
-            y: 100,
-            opacity: 0,
-            rotateX: -70,
-            stagger: 0.06,
-            duration: 1,
-          },
-          '-.3'
-        )
-        .from(
-          '.hero-copy,.hero-buttons',
-          {
-            y: 20,
-            opacity: 0,
-            stagger: 0.12,
-            duration: 0.65,
-          },
-          '-.5'
-        )
-        .from(
-          '.orbit',
-          {
-            scale: 0.7,
-            opacity: 0,
-            rotate: -20,
-            duration: 1.2,
-          },
-          '-.9'
-        );
+      const media = gsap.matchMedia();
 
-      gsap.to('.orbit', {
-        y: -15,
-        rotation: 5,
-        duration: 6,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
+      media.add('(prefers-reduced-motion: no-preference)', () => {
+        const intro = gsap.timeline({
+          defaults: { ease: 'power4.out' },
+        });
+
+        intro
+          .fromTo(
+            '.hero-eyebrow',
+            { y: 14, opacity: 0, clipPath: 'inset(0 0 100% 0)' },
+            { y: 0, opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: 0.65 }
+          )
+          .fromTo(
+            '.hero-art-layer',
+            { opacity: 0, y: 14 },
+            { opacity: 1, y: 0, duration: 1.15, stagger: 0.12 },
+            '-=0.2'
+          )
+          .fromTo(
+            '.hero-name-char',
+            { yPercent: 115, rotateX: -78, opacity: 0 },
+            {
+              yPercent: 0,
+              rotateX: 0,
+              opacity: 1,
+              duration: 1.05,
+              stagger: 0.055,
+            },
+            '-=0.8'
+          )
+          .fromTo(
+            '.hero-role-word',
+            { y: 32, opacity: 0, rotateX: -30 },
+            { y: 0, opacity: 1, rotateX: 0, duration: 0.72, stagger: 0.1 },
+            '-=0.45'
+          )
+          .fromTo(
+            '.hero-service',
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.48, stagger: 0.09 },
+            '-=0.28'
+          )
+          .fromTo(
+            '.hero-supporting-copy,.hero-actions,.hero-scroll-cue',
+            { y: 16, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.65, stagger: 0.1 },
+            '-=0.2'
+          );
+
+        gsap.to('.hero-art-core', {
+          y: -10,
+          duration: 5,
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+        });
+
+        gsap.to('.hero-art-orbit', {
+          rotation: 360,
+          duration: 52,
+          ease: 'none',
+          repeat: -1,
+        });
+
+        gsap.to('.hero-stage', {
+          yPercent: -4,
+          scale: 0.96,
+          rotateX: -4,
+          opacity: 0.76,
+          ease: 'none',
+          transformOrigin: '50% 24%',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1,
+          },
+        });
+
+        const finePointer = window.matchMedia(
+          '(hover: hover) and (pointer: fine)'
+        ).matches;
+        const targets = Array.from(
+          section.querySelectorAll<HTMLElement>('.hero-parallax')
+        ).map((element) => ({
+          element,
+          depth: Number(element.dataset.depth || 1),
+          xTo: gsap.quickTo(element, 'x', {
+            duration: 0.9,
+            ease: 'power3.out',
+          }),
+          yTo: gsap.quickTo(element, 'y', {
+            duration: 0.9,
+            ease: 'power3.out',
+          }),
+        }));
+
+        const moveWithPointer = (event: PointerEvent) => {
+          const bounds = section.getBoundingClientRect();
+          const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+          const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+          targets.forEach(({ depth, xTo, yTo }) => {
+            xTo(x * depth);
+            yTo(y * depth);
+          });
+        };
+
+        const resetPointer = () => {
+          targets.forEach(({ xTo, yTo }) => {
+            xTo(0);
+            yTo(0);
+          });
+        };
+
+        if (finePointer) {
+          section.addEventListener('pointermove', moveWithPointer);
+          section.addEventListener('pointerleave', resetPointer);
+        }
+
+        return () => {
+          section.removeEventListener('pointermove', moveWithPointer);
+          section.removeEventListener('pointerleave', resetPointer);
+        };
       });
-    }, hero);
+
+      return () => media.revert();
+    }, section);
 
     return () => ctx.revert();
   }, []);
@@ -108,97 +191,145 @@ export default function Home() {
   const works = [
     {
       title: 'SOCIAL MEDIA',
-      description: 'Strategy • Content • Management • Growth',
+      description: 'Selected client work and campaign content.',
       href: '/work/social-media',
       icon: Instagram,
     },
     {
       title: 'SEO',
-      description: 'Keyword Research • Optimization • Organic Growth',
+      description: 'Selected client work and search optimization.',
       href: '/work/seo',
       icon: Search,
     },
     {
       title: 'META ADS',
-      description: 'Campaigns • Lead Generation • Optimization',
+      description: 'Verified campaign case studies.',
       href: '/work/meta-ads',
       icon: Megaphone,
     },
     {
       title: 'CREATIVES',
-      description: 'Posters • Reels • Carousels • Ad Creatives',
+      description: 'Selected creative client work.',
       href: '/work/creatives',
       icon: Brush,
     },
   ];
 
   return (
-    <main>
+      <main>
       {/* HERO */}
       <section
         ref={hero}
         id="home"
-        className="relative min-h-screen max-w-7xl mx-auto px-5 md:px-10 pt-36 pb-20 flex items-center overflow-hidden"
+        className="cinematic-hero relative min-h-[100svh] w-full px-5 md:px-10 pt-32 pb-24 flex items-center overflow-hidden"
       >
         <div className="gridbg" />
+        <div className="hero-vignette" aria-hidden="true" />
 
-        <div className="absolute right-[-18%] top-[10%] w-[650px] h-[650px] rounded-full border border-[#c69cff]/20 shadow-[0_0_120px_rgba(169,112,255,.13)] orbit">
-          <div className="absolute inset-12 rounded-full border border-[#c69cff]/10" />
-          <div className="absolute inset-28 rounded-full border border-[#c69cff]/10" />
-          <span className="absolute w-3 h-3 rounded-full bg-[#c69cff] shadow-[0_0_25px_8px_rgba(198,156,255,.5)] top-[17%] left-[53%]" />
+        <div className="hero-art" aria-hidden="true">
+          <div
+            className="hero-art-layer hero-parallax hero-art-orbit hero-art-orbit-outer"
+            data-depth="18"
+          >
+            <span />
+          </div>
+          <div
+            className="hero-art-layer hero-parallax hero-art-orbit hero-art-orbit-inner"
+            data-depth="12"
+          />
+          <div
+            className="hero-art-layer hero-parallax hero-art-card hero-art-card-search"
+            data-depth="28"
+          >
+            <span>01 / DISCOVERY</span>
+            <b>SEARCH</b>
+            <i>INTENT / VISIBILITY</i>
+          </div>
+          <div
+            className="hero-art-layer hero-parallax hero-art-card hero-art-card-social"
+            data-depth="-22"
+          >
+            <span>02 / CULTURE</span>
+            <b>SOCIAL</b>
+            <i>STORY / COMMUNITY</i>
+          </div>
+          <div
+            className="hero-art-layer hero-parallax hero-art-core"
+            data-depth="8"
+          >
+            <span className="hero-core-ring" />
+            <span className="hero-core-light" />
+            <span className="hero-core-crosshair" />
+          </div>
+          <div className="hero-art-grain" />
         </div>
 
-        <div className="relative z-10 max-w-4xl">
-          <div className="kicker text-[#c69cff] italic font-serif text-xl">
-            Digital Marketer
-          </div>
+        <div className="hero-stage relative z-10 mx-auto w-full max-w-[1380px]">
+          <div className="hero-content relative z-10 max-w-5xl">
+            <div className="hero-eyebrow">
+              <span className="hero-eyebrow-mark" />
+              INDEPENDENT DIGITAL STRATEGY / CHENNAI, INDIA
+            </div>
 
-          <h1 className="mt-3 text-[18vw] md:text-[10rem] leading-[.82] font-black tracking-[-.09em]">
-            {'NEELA'.split('').map((letter, index) => (
-              <span className="letter inline-block" key={index}>
-                {letter}
+            <h1 className="hero-name mt-5" aria-label="NEELA V">
+              {'NEELA'.split('').map((letter, index) => (
+                <span className="hero-name-char" aria-hidden="true" key={index}>
+                  {letter}
+                </span>
+              ))}
+              <span className="hero-name-space" aria-hidden="true"> </span>
+              <span className="hero-name-char hero-name-accent" aria-hidden="true">
+                V
               </span>
-            ))}{' '}
-            <span className="letter text-[#c69cff] inline-block">V</span>
-          </h1>
+            </h1>
 
-          <div className="hero-copy mt-8 text-[11px] md:text-sm uppercase tracking-[.12em]">
-            SEO
-            <i className="text-[#a970ff] not-italic mx-2">•</i>
-            Social Media
-            <i className="text-[#a970ff] not-italic mx-2">•</i>
-            Meta Ads
-            <i className="text-[#a970ff] not-italic mx-2">•</i>
-            Google Ads
-          </div>
+            <h2 className="hero-role" aria-label="Digital Marketer">
+              <span className="hero-role-word">DIGITAL</span>
+              <span className="hero-role-word hero-role-accent">MARKETER</span>
+            </h2>
 
-          <p className="hero-copy mt-6 max-w-xl text-sm leading-7 text-[#a9a5b2]">
-            I build digital strategies that help brands get discovered,
-            connect with their audience, and grow.
-          </p>
+            <div className="hero-services" aria-label="Areas of expertise">
+              {['SEO', 'META ADS', 'GOOGLE ADS', 'SOCIAL MEDIA'].map(
+                (service, index) => (
+                  <span className="hero-service" key={service}>
+                    {index > 0 && <i aria-hidden="true" />}
+                    {service}
+                  </span>
+                )
+              )}
+            </div>
 
-          <div className="hero-buttons mt-8 flex gap-3 flex-wrap">
-            <a
-              href="#work"
-              className="px-6 py-3 rounded-full bg-[#c69cff] text-black text-[10px] font-bold tracking-[.13em]"
-            >
-              VIEW MY WORK
-              <ArrowRight size={13} className="inline ml-2" />
-            </a>
+            <p className="hero-supporting-copy mt-6 max-w-xl text-sm leading-7 text-[#b9b2c1]">
+              I build digital strategies that help brands get discovered,
+              connect with their audience, and grow.
+            </p>
 
-            <a
-              href="/resume.pdf"
-              className="px-6 py-3 rounded-full border border-[#c69cff]/35 text-[10px] font-bold tracking-[.13em]"
-            >
-              DOWNLOAD RESUME
-            </a>
+            <div className="hero-actions mt-8 flex gap-3 flex-wrap">
+              <a
+                href="#work"
+                className="hero-primary-action px-6 py-3 text-black text-[10px] font-bold tracking-[.13em]"
+              >
+                VIEW MY WORK
+                <ArrowRight size={13} className="inline ml-2" />
+              </a>
+
+              <a
+                href="/portfolio/resume.pdf"
+                className="hero-secondary-action px-6 py-3 text-[10px] font-bold tracking-[.13em]"
+              >
+                DOWNLOAD RESUME
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 text-[9px] tracking-[.24em] text-[#82798b]">
-          SCROLL TO EXPLORE
-          <ArrowDown size={13} className="animate-bounce" />
-        </div>
+        <a href="#about" className="hero-scroll-cue">
+          <span>SCROLL TO EXPLORE</span>
+          <span className="hero-scroll-line" aria-hidden="true">
+            <span />
+          </span>
+          <ArrowDown size={13} aria-hidden="true" />
+        </a>
       </section>
 
       {/* ABOUT */}
@@ -216,24 +347,8 @@ export default function Home() {
           </h2>
         </Reveal>
 
-        <div className="grid lg:grid-cols-[.75fr_1.25fr] gap-12 items-center mt-14">
+        <div className="mt-14 max-w-5xl">
           <Reveal>
-            <div className="h-[430px] relative border border-[#c69cff]/15 overflow-hidden bg-[#0b0a10]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(169,112,255,.25),transparent_30%)]" />
-
-              <div className="absolute w-[300px] h-[300px] rounded-full border border-[#c69cff]/35 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-
-              <div className="absolute inset-0 grid place-items-center text-[9rem] font-black text-white/[.035]">
-                NV
-              </div>
-
-              <span className="absolute bottom-5 left-5 text-[9px] tracking-[.2em] text-[#7d7485]">
-                PORTRAIT / REPLACE LATER
-              </span>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.1}>
             <h3 className="text-3xl md:text-4xl">
               Digital marketing with a{' '}
               <span className="text-[#c69cff]">creative edge.</span>
@@ -269,7 +384,7 @@ export default function Home() {
               <Counter value="1+" label="Years Experience" />
               <Counter value="10+" label="Clients / Projects" />
               <Counter value="1000+" label="Products Optimized" />
-              <Counter value="100+" label="Creatives Designed" />
+              <Counter value="500+" label="Leads Generated" />
             </div>
           </Reveal>
         </div>
@@ -290,10 +405,10 @@ export default function Home() {
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-[#c69cff]/10 mt-14">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-14">
           {skills.map(([name, description, Icon], index) => (
             <Reveal key={name} delay={index * 0.025}>
-              <div className="group relative min-h-32 bg-[#0b0a10] p-5 hover:bg-[#120d1b] transition">
+              <div className="group relative min-h-32 rounded-xl border border-[#c69cff]/15 bg-[#0b0a10] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c69cff]/40 hover:bg-[#120d1b]">
                 <Icon
                   size={24}
                   strokeWidth={1.3}
@@ -333,31 +448,39 @@ export default function Home() {
         <div className="grid md:grid-cols-2 gap-4 mt-12">
           {works.map((work, index) => {
             const Icon = work.icon;
+            const content = (
+              <div className="group relative min-h-[350px] rounded-2xl border border-[#c69cff]/20 overflow-hidden p-8 flex flex-col justify-between bg-gradient-to-br from-[#21122e] to-[#08050d] transition-all duration-700 hover:border-[#c69cff]/70 hover:shadow-[0_0_70px_rgba(169,112,255,.15)]">
+                <div className="flex items-start justify-between gap-5">
+                  <div className="w-14 h-14 rounded-xl border border-[#c69cff]/30 grid place-items-center text-[#c69cff] group-hover:bg-[#a970ff]/15 transition">
+                    <Icon size={25} />
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-3xl md:text-4xl font-semibold tracking-[-.05em]">
+                    {work.title}
+                  </h3>
+
+                  <p className="mt-3 text-xs text-[#aaa1b1]">
+                    {work.description}
+                  </p>
+
+                  <div className="mt-7 w-11 h-11 rounded-full border border-[#c69cff]/40 grid place-items-center group-hover:bg-[#c69cff] group-hover:text-black transition">
+                    <ArrowRight size={15} />
+                  </div>
+                </div>
+              </div>
+            );
 
             return (
               <Reveal key={work.title} delay={index * 0.08}>
-                <a
-                  href={work.href}
-                  className="group relative min-h-[350px] border border-[#c69cff]/20 overflow-hidden p-8 flex flex-col justify-between bg-gradient-to-br from-[#21122e] to-[#08050d] hover:border-[#c69cff]/70 hover:shadow-[0_0_70px_rgba(169,112,255,.15)] transition-all duration-700"
-                >
-                  <div className="w-14 h-14 border border-[#c69cff]/30 grid place-items-center text-[#c69cff] group-hover:bg-[#a970ff]/15 transition">
-                    <Icon size={25} />
-                  </div>
-
-                  <div>
-                    <h3 className="text-3xl md:text-4xl font-semibold tracking-[-.05em]">
-                      {work.title}
-                    </h3>
-
-                    <p className="mt-3 text-xs text-[#aaa1b1]">
-                      {work.description}
-                    </p>
-
-                    <div className="mt-7 w-11 h-11 rounded-full border border-[#c69cff]/40 grid place-items-center group-hover:bg-[#c69cff] group-hover:text-black transition">
-                      <ArrowRight size={15} />
-                    </div>
-                  </div>
-                </a>
+                {work.href ? (
+                  <a href={work.href} target="_blank" rel="noreferrer">
+                    {content}
+                  </a>
+                ) : (
+                  <div aria-disabled="true">{content}</div>
+                )}
               </Reveal>
             );
           })}
@@ -387,10 +510,10 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-12 mt-14">
           <Reveal>
             <div className="space-y-5 text-sm text-[#c4bccd]">
-              <a href="mailto:your@email.com">✉ your@email.com</a>
+              <a href="mailto:itsneela55@gmail.com">✉ itsneela55@gmail.com</a>
 
-              <a href="tel:+910000000000" className="block">
-                ◉ +91 XXXXX XXXXX
+              <a href="tel:+919361683414" className="block">
+                ◉ +91 93616 83414
               </a>
 
               <div>⌖ Chennai, India</div>
@@ -401,7 +524,7 @@ export default function Home() {
             </div>
 
             <a
-              href="/resume.pdf"
+              href="/portfolio/resume.pdf"
               className="inline-block mt-9 text-xs tracking-[.14em] text-[#c69cff]"
             >
               DOWNLOAD CV ↓
@@ -416,7 +539,7 @@ export default function Home() {
                   'Connect this form to your email service before publishing.'
                 );
               }}
-              className="border border-[#c69cff]/20 p-6 bg-white/[.015]"
+              className="rounded-2xl border border-[#c69cff]/20 p-6 bg-white/[.015]"
             >
               <input
                 required
