@@ -1,0 +1,11 @@
+.reveal {
+	will-change: opacity, transform, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal {
+		transform: none !important;
+		filter: none !important;
+		opacity: 1 !important;
+	}
+}

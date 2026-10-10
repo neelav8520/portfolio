@@ -1,7 +1,15 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ExternalLink, Globe2, Instagram } from 'lucide-react';
+import {
+	ArrowLeft,
+	ArrowRight,
+	ExternalLink,
+	Globe2,
+	Instagram,
+} from 'lucide-react';
 import { Reveal } from '@/components/Reveal';
+import { AnimatedMetric, CaseStudyReveal } from '@/components/CaseStudyMotion';
+import styles from './case-study.module.css';
 import { meta, projects, Slug } from '@/data/projects';
 
 export function generateStaticParams() {
@@ -29,159 +37,289 @@ export default function ClientWorkPage({
 	const isMetaAds = categorySlug === 'meta-ads';
 	const isCreatives = categorySlug === 'creatives';
 
+	if (isCreatives) {
+		return (
+			<main className="min-h-screen px-5 pb-24 pt-36 md:px-10">
+				<div className="mx-auto max-w-7xl">
+					<a
+						href={`/work/${categorySlug}`}
+						className="inline-flex items-center gap-2 text-[10px] tracking-[.18em] text-[#a9a5b2] transition hover:text-white"
+					>
+						<ArrowLeft size={13} /> {category.title} / CLIENT WORK
+					</a>
+
+					<div className="mt-12 grid gap-12 lg:grid-cols-[1fr_.9fr] lg:items-end">
+						<Reveal>
+							<div className="text-[10px] tracking-[.28em] text-[#c69cff]">
+								WORK / {category.title}
+							</div>
+							<h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[1.05] md:text-7xl">
+								{client.title}
+							</h1>
+							{client.headline && (
+								<p className="mt-6 text-2xl font-medium text-[#d8c0f4] md:text-3xl">
+									{client.headline}
+								</p>
+							)}
+						</Reveal>
+					</div>
+				</div>
+			</main>
+		);
+	}
+
+	if (!isSocial && !isSeo && !isMetaAds) notFound();
+
+	const clientUrl = client.url?.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
 	return (
-		<main className="min-h-screen px-5 pb-24 pt-36 md:px-10">
-			<div className="mx-auto max-w-7xl">
+		<main className={styles.shell}>
+			<div className={styles.container}>
 				<a
 					href={`/work/${categorySlug}`}
-					className="inline-flex items-center gap-2 text-[10px] tracking-[.18em] text-[#a9a5b2] transition hover:text-white"
+					className={styles.backLink}
 				>
 					<ArrowLeft size={13} /> {category.title} / CLIENT WORK
 				</a>
 
-				<div className="mt-12 grid gap-12 lg:grid-cols-[1fr_.9fr] lg:items-end">
-					<Reveal>
-						<div className="text-[10px] tracking-[.28em] text-[#c69cff]">
-							WORK / {category.title}
-						</div>
-						<h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[1.05] md:text-7xl">
-							{client.title}
-						</h1>
-						{client.headline && (
-							<p className="mt-6 text-2xl font-medium text-[#d8c0f4] md:text-3xl">
-								{client.headline}
-							</p>
-						)}
-						{!isCreatives && client.description && (
-							<p className="mt-6 max-w-2xl text-sm leading-8 text-[#aaa3b1]">
-								{client.description}
-							</p>
-						)}
-					</Reveal>
-
-					{client.url && (
-						<Reveal delay={0.08} className="lg:justify-self-end">
-							<a
-								href={client.url}
-								target="_blank"
-								rel="noreferrer"
-								className="inline-flex min-h-12 items-center gap-3 rounded-full border border-[#c69cff]/30 px-5 text-xs text-[#eee7f5] transition hover:border-[#c69cff]/70 hover:bg-[#c69cff]/10"
-							>
-								{isSocial ? <Instagram size={15} /> : <Globe2 size={15} />}
-								{isSocial ? 'VIEW INSTAGRAM PROFILE' : 'VISIT WEBSITE'}
-								<ExternalLink size={13} className="text-[#c69cff]" />
-							</a>
-						</Reveal>
-					)}
-				</div>
-
-				{isSocial && client.image && (
-					<section className="mt-16 grid gap-12 lg:grid-cols-[minmax(260px,390px)_1fr] lg:items-center">
-						<Reveal className="mx-auto w-full max-w-[360px]">
-							<div className="work-phone-frame">
-								<div className="mb-3 flex items-center justify-center gap-2 text-[8px] tracking-[.12em] text-[#c8bdce]">
-									<span className="h-1.5 w-1.5 rounded-full bg-[#c69cff]" />
-									INSTAGRAM PROFILE
+				{isSocial && (
+					<>
+						<section className={styles.heroGrid}>
+							<CaseStudyReveal className={styles.heroCopy}>
+								<p className={styles.eyebrow}>SOCIAL MEDIA / CLIENT CASE STUDY</p>
+								<h1 className={styles.title}>{client.title}</h1>
+								<p className={styles.lede}>{client.description}</p>
+								<div className={styles.heroMeta}>
+									<span className={styles.pill}>INSTAGRAM PROFILE WORK</span>
+									<span className={styles.pill}>QUALITATIVE SHOWCASE</span>
 								</div>
-								<div className="work-phone-screen relative aspect-[9/17]">
-									<Image
-										src={client.image}
-										alt={`${client.title} Instagram profile screenshot`}
-										fill
-										sizes="(max-width: 768px) 85vw, 360px"
-										className="object-contain"
-									/>
-								</div>
-							</div>
-						</Reveal>
-						<Reveal delay={0.1}>
-							<div className="max-w-xl border-l border-[#c69cff]/30 pl-6 md:pl-8">
-								<div className="text-[9px] tracking-[.24em] text-[#c69cff]">
-									SOCIAL MEDIA WORK
-								</div>
-								<p className="mt-5 text-lg leading-8 text-[#eee7f5]">
-									The supplied Instagram profile is presented as the visual record of this work. No social media performance metrics are included.
-								</p>
-							</div>
-						</Reveal>
-					</section>
-				)}
-
-				{isSeo && client.image && (
-					<section className="mt-16 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center">
-						<Reveal>
-							<div className="work-browser-frame">
-								<div className="flex h-11 items-center gap-2 border-b border-white/10 bg-[#15121a] px-4">
-									<span className="h-2.5 w-2.5 rounded-full bg-[#c69cff]/80" />
-									<span className="h-2.5 w-2.5 rounded-full bg-white/25" />
-									<span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-									<div className="ml-3 min-w-0 flex-1 truncate rounded-md bg-black/35 px-3 py-1.5 text-[9px] text-[#aaa3b1]">
-										{client.url?.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-									</div>
-								</div>
-								<div className="relative aspect-[16/10] bg-[#08070c]">
-									<Image
-										src={client.image}
-										alt={`${client.title} SEO project screenshot`}
-										fill
-										sizes="(max-width: 1024px) 100vw, 800px"
-										className="object-contain p-3 md:p-5"
-									/>
-								</div>
-							</div>
-						</Reveal>
-						<Reveal delay={0.1}>
-							<div className="text-[9px] tracking-[.24em] text-[#c69cff]">
-								SEO WORK
-							</div>
-							<p className="mt-5 max-w-lg text-lg leading-8 text-[#eee7f5]">
-								SEO work can include keyword research, on-page optimization, and technical or on-site improvements. The supplied project screenshot is shown without ranking, traffic, or other unverified result claims.
-							</p>
-						</Reveal>
-					</section>
-				)}
-
-				{isMetaAds && client.metrics && (
-					<section className="mt-16">
-						<Reveal>
-							<div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#c69cff]/20 pb-5">
-								<div>
-									<div className="text-[9px] tracking-[.24em] text-[#c69cff]">
-										VERIFIED CAMPAIGN TOTALS
-									</div>
-									<h2 className="mt-3 text-2xl font-medium md:text-3xl">
-										Campaign overview
-									</h2>
-								</div>
-								{client.period && (
-									<span className="rounded-full border border-white/10 px-4 py-2 text-[10px] text-[#c9c1d0]">
-										{client.period}
-									</span>
+								{client.url && (
+									<a
+										href={client.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={styles.action}
+									>
+										<Instagram size={15} />
+										VIEW INSTAGRAM PROFILE
+										<ExternalLink size={13} />
+									</a>
 								)}
-							</div>
-						</Reveal>
-						<div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-							{client.metrics.map((metric, index) => (
-								<Reveal key={metric.label} delay={index * 0.045}>
-									<div className="work-metric-card relative min-h-36 overflow-hidden p-5">
-										<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c69cff]/70 to-transparent" />
-										<div className="text-[9px] tracking-[.16em] text-[#aaa3b1]">
-											{metric.label}
+							</CaseStudyReveal>
+
+							{client.image && (
+								<CaseStudyReveal className={styles.mediaStage} delay={0.12}>
+									<div className={styles.device}>
+										<div className={styles.deviceScreen}>
+											<Image
+												src={client.image}
+												alt={`${client.title} Instagram profile screenshot`}
+												fill
+												priority
+												sizes="(max-width: 760px) 72vw, 322px"
+												className="object-contain"
+											/>
 										</div>
-										<div className="mt-5 text-2xl font-medium text-white md:text-3xl">
-											{metric.value}
-										</div>
-										{metric.context && (
-											<p className="mt-3 text-[10px] leading-5 text-[#9e96a7]">
-												{metric.context}
-											</p>
-										)}
 									</div>
-								</Reveal>
-							))}
-						</div>
-					</section>
+									<p className={styles.mediaCaption}>SUPPLIED INSTAGRAM PROFILE SCREENSHOT</p>
+								</CaseStudyReveal>
+							)}
+						</section>
+
+						<section className={styles.contentSection}>
+							<CaseStudyReveal className={styles.sectionHeading}>
+								<p className={styles.eyebrow}>CONFIRMED PROJECT SCOPE</p>
+								<h2 className={styles.sectionTitle}>What I Worked On</h2>
+								<p className={styles.sectionCopy}>
+									The available project record confirms social media content and Instagram profile work for this client.
+								</p>
+							</CaseStudyReveal>
+							<div className={styles.scopeGrid}>
+								<CaseStudyReveal delay={0.04}>
+									<div className={styles.scopeCard}>
+										<p className={styles.scopeLabel}>CONTENT</p>
+										<p className={styles.scopeText}>Social media content</p>
+									</div>
+								</CaseStudyReveal>
+								<CaseStudyReveal delay={0.1}>
+									<div className={styles.scopeCard}>
+										<p className={styles.scopeLabel}>PROFILE</p>
+										<p className={styles.scopeText}>Instagram profile work</p>
+									</div>
+								</CaseStudyReveal>
+							</div>
+							<CaseStudyReveal delay={0.12}>
+								<div className={styles.notice}>
+									<span className={styles.noticeMark} aria-hidden="true" />
+									<div>
+										<p className={styles.noticeTitle}>INSTAGRAM INSIGHTS NOT PROVIDED</p>
+										<p className={styles.noticeText}>
+											The profile screenshot is a visual sample, not Insights reporting. No reach, impressions, visits, engagement, or growth metrics are claimed here.
+										</p>
+									</div>
+								</div>
+							</CaseStudyReveal>
+						</section>
+					</>
 				)}
+
+				{isSeo && (
+					<>
+						<section className={styles.heroGrid}>
+							<CaseStudyReveal className={styles.heroCopy}>
+								<p className={styles.eyebrow}>SEO / SEARCH VISIBILITY SNAPSHOT</p>
+								<h1 className={styles.title}>{client.title}</h1>
+								<p className={styles.lede}>{client.description}</p>
+								{client.url && (
+									<a
+										href={client.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={styles.action}
+									>
+										<Globe2 size={15} />
+										VISIT WEBSITE
+										<ExternalLink size={13} />
+									</a>
+								)}
+							</CaseStudyReveal>
+
+							{client.image && (
+								<CaseStudyReveal className={styles.mediaStage} delay={0.12}>
+									<div className={styles.browserFrame}>
+										<div className={styles.browserBar}>
+											<span className={styles.browserDot} aria-hidden="true" />
+											<span>GOOGLE SEARCH / MOBILE SNAPSHOT</span>
+										</div>
+										<div className={styles.browserImage}>
+											<Image
+												src={client.image}
+												alt={`${client.title} supplied mobile search screenshot`}
+												fill
+												priority
+												sizes="(max-width: 760px) 100vw, 400px"
+												className="object-contain"
+											/>
+										</div>
+									</div>
+									<p className={styles.mediaCaption}>SUPPLIED SEARCH SCREENSHOT / {clientUrl}</p>
+								</CaseStudyReveal>
+							)}
+						</section>
+
+						<section className={styles.contentSection}>
+							<CaseStudyReveal className={styles.sectionHeading}>
+								<p className={styles.eyebrow}>EVIDENCE AND SCOPE</p>
+								<h2 className={styles.sectionTitle}>On-page SEO work</h2>
+								<p className={styles.sectionCopy}>
+									The project record identifies on-page SEO work. The supplied mobile search screenshot is shown as a snapshot, not as ranking-history or performance reporting.
+								</p>
+							</CaseStudyReveal>
+							<div className={styles.scopeGrid}>
+								<CaseStudyReveal delay={0.04}>
+									<div className={styles.scopeCard}>
+										<p className={styles.scopeLabel}>CONFIRMED WORK</p>
+										<p className={styles.scopeText}>On-page SEO</p>
+									</div>
+								</CaseStudyReveal>
+								<CaseStudyReveal delay={0.1}>
+									<div className={styles.scopeCard}>
+										<p className={styles.scopeLabel}>EVIDENCE INCLUDED</p>
+										<p className={styles.scopeText}>One supplied mobile search screenshot</p>
+									</div>
+								</CaseStudyReveal>
+							</div>
+							<CaseStudyReveal delay={0.12}>
+								<div className={styles.notice}>
+									<span className={styles.noticeMark} aria-hidden="true" />
+									<div>
+										<p className={styles.noticeTitle}>SEARCH PERFORMANCE DATA NOT PROVIDED</p>
+										<p className={styles.noticeText}>
+											No verified keyword positions, clicks, impressions, optimization totals, or reporting period were supplied for this client.
+										</p>
+									</div>
+								</div>
+							</CaseStudyReveal>
+						</section>
+					</>
+				)}
+
+				{isMetaAds && (
+					<>
+						<section className={styles.metaHero}>
+							<CaseStudyReveal className={styles.metaHeading}>
+								<p className={styles.eyebrow}>META ADS / CAMPAIGN CASE STUDY</p>
+								<h1 className={styles.title}>{client.title}</h1>
+								{client.headline && (
+									<div className={styles.leadHighlight}>
+										<p className={styles.scopeLabel}>USER-REPORTED TOTAL / NOT VERIFIED BY EXPORT</p>
+										<p className={styles.leadValue}>{client.headline}</p>
+										<p className={styles.noticeText}>
+											The available Meta Ads export does not cover the full period needed to verify this overall figure. Campaign totals below are limited to the available reporting period.
+										</p>
+									</div>
+								)}
+								{!client.headline && client.description && (
+									<p className={styles.lede}>{client.description}</p>
+								)}
+							</CaseStudyReveal>
+						</section>
+
+						<section className={styles.contentSection}>
+							<CaseStudyReveal>
+								<div className={styles.metricsHeader}>
+									<div>
+										<p className={styles.eyebrow}>VERIFIED CAMPAIGN TOTALS</p>
+										<h2 className={styles.sectionTitle}>Campaign overview</h2>
+									</div>
+									<p className={styles.period}>
+										{client.period ?? 'REPORTING PERIOD NOT PROVIDED'}
+									</p>
+								</div>
+							</CaseStudyReveal>
+
+							{client.metrics && (
+								<div className={styles.metricsGrid}>
+									{client.metrics.map((metric, index) => (
+										<CaseStudyReveal key={metric.label} delay={index * 0.055}>
+											<div className={styles.metricCard}>
+												<p className={styles.metricLabel}>{metric.label}</p>
+												<p className={styles.metricValue}>
+													<AnimatedMetric value={metric.value} />
+												</p>
+												{metric.context && (
+													<p className={styles.metricContext}>{metric.context}</p>
+												)}
+											</div>
+										</CaseStudyReveal>
+									))}
+								</div>
+							)}
+
+							<CaseStudyReveal delay={0.1}>
+								<div className={styles.notice}>
+									<span className={styles.noticeMark} aria-hidden="true" />
+									<div>
+										<p className={styles.noticeTitle}>CAMPAIGN-LEVEL TOTALS ONLY</p>
+										<p className={styles.noticeText}>
+											The available data does not include a time series, so no trend chart is shown. No actual ad creative preview was included in the available project assets.
+										</p>
+									</div>
+								</div>
+							</CaseStudyReveal>
+						</section>
+					</>
+				)}
+
+				<div className={styles.closingLinks}>
+					<a href={`/work/${categorySlug}`} className={styles.closingLink}>
+						<ArrowLeft size={13} className="mr-2 inline" />
+						ALL {category.title} CLIENTS
+					</a>
+					<a href="/#contact" className={styles.closingLink}>
+						START A PROJECT <ArrowRight size={13} className="ml-2 inline" />
+					</a>
+				</div>
 			</div>
 		</main>
 	);
