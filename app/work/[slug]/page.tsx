@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Reveal } from '@/components/Reveal';
 import { meta, projects, Slug } from '@/data/projects';
@@ -69,10 +70,8 @@ export default async function WorkPage({ params }: { params: { slug: string } })
 				<div className="max-w-7xl mx-auto px-5 md:px-10 mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{items.map((item, index) => (
 						<Reveal key={item.slug} delay={index * 0.055}>
-							<a
+							<Link
 								href={`/work/${slug}/${item.slug}`}
-								target="_blank"
-								rel="noreferrer"
 								className="group flex min-h-48 items-end justify-between gap-5 rounded-2xl border border-[#c69cff]/20 bg-gradient-to-br from-[#17101f] to-[#09070c] p-7 transition duration-500 hover:-translate-y-1 hover:border-[#c69cff]/55"
 							>
 								<div>
@@ -86,7 +85,7 @@ export default async function WorkPage({ params }: { params: { slug: string } })
 								<span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#c69cff]/35 text-[#c69cff] transition group-hover:bg-[#c69cff] group-hover:text-black">
 									<ArrowRight size={15} />
 								</span>
-							</a>
+							</Link>
 						</Reveal>
 					))}
 				</div>

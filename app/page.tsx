@@ -23,6 +23,7 @@ import {
   Workflow,
 } from 'lucide-react';
 
+import Link from 'next/link';
 import { Counter } from '@/components/Counter';
 import { Reveal } from '@/components/Reveal';
 
@@ -475,9 +476,9 @@ export default function Home() {
             return (
               <Reveal key={work.title} delay={index * 0.08}>
                 {work.href ? (
-                  <a href={work.href} target="_blank" rel="noreferrer">
+                  <Link href={work.href}>
                     {content}
-                  </a>
+                  </Link>
                 ) : (
                   <div aria-disabled="true">{content}</div>
                 )}
