@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -9,8 +10,12 @@ import {
 } from 'lucide-react';
 import { Reveal } from '@/components/Reveal';
 import { AnimatedMetric, CaseStudyReveal } from '@/components/CaseStudyMotion';
+import { CreativeCaseStudy } from '@/components/CreativeCaseStudy';
+import { SeoCaseStudy } from '@/components/SeoCaseStudy';
 import styles from './case-study.module.css';
+import { creativeCaseStudies } from '@/data/creativeCaseStudies';
 import { meta, projects, Slug } from '@/data/projects';
+import { seoCaseStudies } from '@/data/seoCaseStudies';
 
 type SocialMetric = {
 	label: string;
@@ -209,6 +214,18 @@ export default function ClientWorkPage({
 	);
 	if (!client) notFound();
 
+	if (params.slug === 'seo') {
+		const study = seoCaseStudies[params.client as keyof typeof seoCaseStudies];
+		if (!study) notFound();
+		return <SeoCaseStudy study={study} />;
+	}
+
+	if (params.slug === 'creatives') {
+		const study = creativeCaseStudies[params.client];
+		if (!study) notFound();
+		return <CreativeCaseStudy study={study} />;
+	}
+
 	const isSocial = categorySlug === 'social-media';
 	const isSeo = categorySlug === 'seo';
 	const isMetaAds = categorySlug === 'meta-ads';
@@ -218,12 +235,12 @@ export default function ClientWorkPage({
 		return (
 			<main className="min-h-screen px-5 pb-24 pt-36 md:px-10">
 				<div className="mx-auto max-w-7xl">
-					<a
+					<Link
 						href={`/work/${categorySlug}`}
 						className="inline-flex items-center gap-2 text-[10px] tracking-[.18em] text-[#a9a5b2] transition hover:text-white"
 					>
 						<ArrowLeft size={13} /> {category.title} / CLIENT WORK
-					</a>
+					</Link>
 
 					<div className="mt-12 grid gap-12 lg:grid-cols-[1fr_.9fr] lg:items-end">
 						<Reveal>
@@ -252,12 +269,12 @@ export default function ClientWorkPage({
 	return (
 		<main className={styles.shell}>
 			<div className={styles.container}>
-				<a
+				<Link
 					href={`/work/${categorySlug}`}
 					className={styles.backLink}
 				>
 					<ArrowLeft size={13} /> {category.title} / CLIENT WORK
-				</a>
+				</Link>
 
 				{isSocial && (
 					<>
@@ -550,13 +567,13 @@ export default function ClientWorkPage({
 				)}
 
 				<div className={styles.closingLinks}>
-					<a href={`/work/${categorySlug}`} className={styles.closingLink}>
+					<Link href={`/work/${categorySlug}`} className={styles.closingLink}>
 						<ArrowLeft size={13} className="mr-2 inline" />
 						ALL {category.title} CLIENTS
-					</a>
-					<a href="/#contact" className={styles.closingLink}>
+					</Link>
+					<Link href="/#contact" className={styles.closingLink}>
 						START A PROJECT <ArrowRight size={13} className="ml-2 inline" />
-					</a>
+					</Link>
 				</div>
 			</div>
 		</main>

@@ -1,0 +1,259 @@
+.carouselHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 28px 0 15px;
+}
+
+.carouselHeader p,
+.modalCopy > p {
+	margin: 0;
+	color: #a89bb7;
+	font-size: 9px;
+	font-weight: 600;
+	letter-spacing: .17em;
+}
+
+.pauseButton {
+	padding: 10px 12px;
+	border: 1px solid rgba(198, 156, 255, .28);
+	border-radius: 999px;
+	background: #100d15;
+	color: #ded0ef;
+	font-size: 8px;
+	letter-spacing: .12em;
+	cursor: pointer;
+}
+
+.pauseButton:hover,
+.pauseButton:focus-visible {
+	border-color: #c69cff;
+	color: #fff;
+}
+
+.viewport {
+	width: 100%;
+	overflow: hidden;
+	border: 1px solid rgba(198, 156, 255, .16);
+	border-radius: 18px;
+	background: linear-gradient(145deg, rgba(25, 19, 31, .9), rgba(8, 7, 10, .96));
+}
+
+.track {
+	display: flex;
+	width: max-content;
+	animation: creative-loop 52s linear infinite;
+	will-change: transform;
+}
+
+.lane {
+	display: flex;
+	width: max-content;
+	align-items: stretch;
+	gap: 14px;
+	padding: 14px;
+}
+
+.card {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: #b9adca;
+	text-align: left;
+	cursor: pointer;
+}
+
+.card img {
+	display: block;
+	width: auto;
+	height: clamp(250px, 34vw, 390px);
+	max-width: min(72vw, 460px);
+	border: 1px solid rgba(255, 255, 255, .12);
+	border-radius: 10px;
+	background: #111015;
+	object-fit: contain;
+	transition: transform .25s ease, border-color .25s ease;
+}
+
+.card:hover img,
+.card:focus-visible img {
+	transform: translateY(-4px);
+	border-color: rgba(198, 156, 255, .72);
+}
+
+.card span {
+	font-size: 8px;
+	letter-spacing: .15em;
+}
+
+.viewport:hover .track,
+.viewport:focus-within .track,
+.paused .track {
+	animation-play-state: paused;
+}
+
+.hint {
+	margin: 12px 0 0;
+	color: #8d8497;
+	font-size: 10px;
+	line-height: 1.6;
+}
+
+.modalBackdrop {
+	position: fixed;
+	z-index: 200;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	overflow-y: auto;
+	padding: 24px;
+	background: rgba(4, 3, 6, .88);
+	backdrop-filter: blur(12px);
+}
+
+.modal {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(250px, .9fr);
+	width: min(100%, 960px);
+	max-height: min(88vh, 820px);
+	overflow: auto;
+	border: 1px solid rgba(198, 156, 255, .3);
+	border-radius: 18px;
+	background: #0c0a10;
+	box-shadow: 0 30px 100px rgba(0, 0, 0, .6);
+}
+
+.closeButton {
+	position: absolute;
+	z-index: 2;
+	top: 12px;
+	right: 12px;
+	display: grid;
+	width: 38px;
+	height: 38px;
+	place-items: center;
+	border: 1px solid rgba(255, 255, 255, .18);
+	border-radius: 50%;
+	background: rgba(5, 4, 7, .8);
+	color: #fff;
+	cursor: pointer;
+}
+
+.modalArtwork {
+	display: grid;
+	min-height: 380px;
+	place-items: center;
+	padding: 28px;
+	background: #09080c;
+}
+
+.modalArtwork img {
+	display: block;
+	max-width: 100%;
+	max-height: 70vh;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+}
+
+.modalCopy {
+	align-self: center;
+	padding: clamp(24px, 4vw, 46px);
+}
+
+.modalCopy h2 {
+	margin: 12px 0 26px;
+	color: #f6f0fb;
+	font-size: clamp(26px, 4vw, 38px);
+	font-weight: 550;
+	letter-spacing: -.04em;
+	line-height: 1.1;
+}
+
+.modalCopy dl,
+.modalCopy dl div {
+	display: grid;
+	gap: 7px;
+}
+
+.modalCopy dl {
+	gap: 20px;
+	margin: 0;
+}
+
+.modalCopy dt {
+	color: #c69cff;
+	font-size: 10px;
+	letter-spacing: .1em;
+}
+
+.modalCopy dd {
+	margin: 0;
+	color: #bcb4c4;
+	font-size: 12px;
+	line-height: 1.7;
+}
+
+@keyframes creative-loop {
+	to { transform: translateX(-50%); }
+}
+
+@media (max-width: 700px) {
+	.track {
+		animation-duration: 38s;
+	}
+
+	.lane {
+		gap: 10px;
+		padding: 10px;
+	}
+
+	.card img {
+		height: 280px;
+		max-width: 78vw;
+	}
+
+	.modal {
+		grid-template-columns: 1fr;
+	}
+
+	.modalArtwork {
+		min-height: 270px;
+		padding: 20px;
+	}
+
+	.modalArtwork img {
+		max-height: 48vh;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.track {
+		width: 100%;
+		animation: none;
+		will-change: auto;
+	}
+
+	.lane:first-child {
+		width: max-content;
+	}
+
+	.lane[aria-hidden='true'] {
+		display: none;
+	}
+
+	.viewport {
+		overflow-x: auto;
+	}
+
+	.card img {
+		transition: none;
+	}
+}
